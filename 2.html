@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Flappy Bird</title>
+	<meta charset="utf-8">
+
+	<script type="text/javascript">
+		// 绘制环境
+		var context;
+
+		var birds = ["./0.gif","./1.gif","./2.gif"];
+		var index = 0;
+
+		var bgImage = new Background(0,0,400,600,"./bg.png");
+		var ground = new Background(0,550,400,200,"./ground.png");
+		
+		var upPipe = new Pipe(0,0,100,250,"./pipe.png");
+		var downPipe = new Pipe(0,400,100,150,"./pipe.png");
+
+		var bird = new Bird(50,0,40,40);
+		var v = 10;
+		var gravity = 10;
+		var valecity = 10;
+		var score = 0;
+		var isScore = false;
+		var timer;
+		var isOver = false;
+		var count = 0;
+
+
+		function init() {
+			// 绘制图片
+			var canvas = document.getElementById("canvas");
+			context = canvas.getContext('2d');
+			drawWall();
+
+			timer = window.setInterval(drawWall,80);
+
+		}
+		function drawWall(){
+		bgImage.draw();
+		ground.draw();
+		upPipe.draw(true);
+		downPipe.draw(false);
+		bird.draw();
+		caculator();
+			context.fillStyle = "blue";
+			context.font="36px Accent";
+			context.fillText("score： "+score,200,50);
+		}
+		function caculator(){
+			//碰撞检测
+			//天空
+			var upCondition =bird.y<=0;
+			//地面
+			var downCondition = bird.y+bird.height>=ground.y;
+
+			//上障碍物检测
+			var upPipeCondition = ((bird.x+bird.width>upPipe.x)&& (bird.y>upPipe.y)&&(bird.x+bird.width<upPipe.x+upPipe.width)
+			&&(bird.y<upPipe.y+upPipe.height))||
+					((bird.x+bird.width>upPipe.x)&&(bird.y>upPipe.y)&&(bird.x+bird.width<upPipe.x+upPipe.width)
+					&&(bird.y<upPipe.y+upPipe.height))
+			//下障碍物检测
+			var downPipeCondition = ((bird.x>downPipe.x)&&(bird.y>downPipe.y)&&(bird.x<downPipe.x+downPipe.width)
+			&&(bird.y<downPipe.y+downPipe.height))||
+					((bird.x>downPipe.x)&&(bird.y+bird.height>downPipe.y)&&(bird.x<downPipe.x+downPipe.width)
+					&&(bird.y+bird.height<downPipe.y+downPipe.height))
+			if(upCondition||downCondition||upPipeCondition||downPipeCondition){
+				count++;
+				if(count>=10){
+					context.fillStyle = "red";
+					context.font="36px Accent";
+					context.fillText("GAME OVER!!!",80,400);
+					clearInterval(timer);
+					isOver = true;
+				}
+				console.log("测试撞到的次数");
+			}
+			bird.y+=(v+gravity)/2;
+			if(upPipe.width+upPipe.x>0){
+				upPipe.x-=valecity;
+				downPipe.x-=valecity;
+			}else{
+				upPipe.x=400;
+				downPipe.x=400;
+				upPipe.height =Math.random()*200+100;
+				downPipe.y = upPipe.height+200;
+				downPipe.height = 600-upPipe.y-50;
+				isScore = true;
+			}
+			if(isScore==true&&bird.x>upPipe.x+upPipe.width){
+				score+=10;
+				if(score<1000&&score%50==0&&score!=0){
+					v+=5;
+					valecity+=5;
+					bird.width+=40;
+					bird.height+=40;
+				}
+				isScore = false;
+			}
+		}
+		document.onkeyup =  function(e){
+			//console.log("123");
+			e=e||event;
+			var currentKey = e.keyCode|| e.which|| e.charCode;
+			switch(currentKey) {
+				case 32:
+				bird.y-=80;
+						if(bird.y<0){
+							bird.y=0;
+						};
+						if((bird.x>upPipe.x)&&(bird.x+bird.width<upPipe.x+upPipe.width)&&(bird.y<upPipe.y+upPipe.height)){
+							bird.y=upPipe.y+upPipe.height;
+						};
+					break;
+			}
+		}
+		document.onclick = function(){
+			if(isOver==true){
+				isOver=false;
+				window.location.reload();
+			}
+		}
+		// 背景图片及地面的构造函数
+		function Background (x,y,width,height,src){
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.height = height;
+			// this.src = src;
+			var img  = new Image();
+			img.src = src;
+			this.image = img;
+			this.draw = bgDraw;
+		}
+		function bgDraw(){
+			context.drawImage(this.image,this.x,this.y,this.width,this.height);
+		}
+		// 上下障碍物的构造函数
+		function Pipe(x,y,width,height,src){
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.height = height;
+			// this.src = src;
+			var img  = new Image();
+			img.src = src;
+			this.image = img;
+			this.draw = pipeDraw;
+		}
+		function pipeDraw(isup){
+			if (isup == true){
+				context.drawImage(this.image,150,500,150,800,this.x,this.y,this.width,this.height);
+			}else{
+				context.drawImage(this.image,0,500,150,500,this.x,this.y,this.width,this.height);
+			}
+		}
+		// 小鸟的构造函数
+		function Bird(x,y,width,height){
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.height = height;
+			this.draw = birdDraw;
+		}
+		function birdDraw(){
+			var img = new Image();
+			img.src = birds[index%3];
+			index++;
+			context.drawImage(img,this.x,this.y,this.width,this.height);
+		}
+	</script>
+</head>
+<body onload="init()">
+	<center>
+	<canvas id="canvas" width = "400" height="600"></canvas>
+	</center>
+</body>
+</html>

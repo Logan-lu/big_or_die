@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Flyingbird</title>
+	<meta charset="utf-8">
+
+	<script type="text/javascript">
+		function init() {
+			var canvas = document.getElementById("canvas");
+			var context = canvas.getContext('2d');
+
+			var img = new Image();
+			img.src="./bg.png";
+			img.onload = function(){
+			context.drawImage(img,0,0,400,600);}
+
+			var img1 = new Image();
+			img1.src="./ground.png";
+			img1.onload = function(){
+			context.drawImage(img1,0,550,400,200);}
+		}
+   
+	</script>
+</head>
+<body onload="init()">
+	<center>
+	<canvas id="canvas" width = "400" height="600"></canvas>
+	</center>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Flyingbird</title>
+	<meta charset="utf-8">
+
+	<script type="text/javascript">
+		// 绘制环境
+		var context;
+
+		var birds = ["./0.gif","./1.gif","./2.gif"];
+		var index = 0;
+
+		var bgImage = new Background(0,0,400,600,"./bg.png");
+		var ground = new Background(0,550,400,200,"./ground.png");
+		
+		var upPipe = new Pipe(0,0,100,250,"./pipe.png");
+		var downPipe = new Pipe(0,400,100,150,"./pipe.png");
+
+		var bird = new Bird(0,0,40,40);
+
+		function init() {
+			// 绘制图片
+			var canvas = document.getElementById("canvas");
+			context = canvas.getContext('2d');
+
+			// var img = new Image();
+			// img.src="./bg.png";                                                                    
+			// img.onload = function(){
+			// context.drawImage(img,0,0,400,600);}
+
+			// var img1 = new Image();
+			// img1.src="./ground.png";
+			// img1.onload = function(){
+			// context.drawImage(img1,0,550,400,200);}
+
+		// bgImage.draw();
+		// ground.draw();
+
+		// upPipe.draw();
+		// downPipe.draw();
+		drawWall();
+
+		window.setInterval(drawWall,80);
+
+		}
+   		
+		function drawWall(){
+
+		bgImage.draw();
+		ground.draw();
+
+		upPipe.draw(true);
+		downPipe.draw(false);
+
+		bird.draw();
+		}
+		// 背景图片及地面的构造函数
+		function Background (x,y,width,height,src){
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.height = height;
+			// this.src = src;
+			var img  = new Image();
+			img.src = src;
+			this.image = img;
+			this.draw = bgDraw;
+		}
+		function bgDraw(){
+			context.drawImage(this.image,this.x,this.y,this.width,this.height);
+		}
+		// 上下障碍物的构造函数
+		function Pipe(x,y,width,height,src){
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.height = height;
+			// this.src = src;
+			var img  = new Image();
+			img.src = src;
+			this.image = img;
+			this.draw = pipeDraw;
+		}
+		function pipeDraw(isup){
+			if (isup == true){
+				context.drawImage(this.image,150,500,150,800,this.x,this.y,this.width,this.height);
+			}else{
+				context.drawImage(this.image,0,500,150,500,this.x,this.y,this.width,this.height);
+			}
+		}
+
+		// 小鸟的构造函数
+		function Bird(x,y,width,height){
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.height = height;
+			this.draw = birdDraw;
+		}
+		function birdDraw(){
+			var img = new Image();
+			img.src = birds[index%3];
+			index++;
+			context.drawImage(img,this.x,this.y,this.width,this.height);
+		}
+
+	</script>
+</head>
+<body onload="init()">
+	<center>
+	<canvas id="canvas" width = "400" height="600"></canvas>
+	</center>
+</body>
+</html>
